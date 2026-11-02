@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo ERP Praktikum - Politeknik META Industri</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f6f9; color: #333; line-height: 1.6; }
+header { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+header h1 { font-size: 1.4rem; margin-bottom: 4px; }
+header p { font-size: 0.8rem; opacity: 0.9; }
+nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 12px; background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+nav button { padding: 8px 14px; border: 2px solid #2563eb; background: white; color: #2563eb; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: all 0.2s; }
+nav button.active, nav button:hover { background: #2563eb; color: white; }
+main { max-width: 1200px; margin: 20px auto; padding: 0 14px; }
+.praktikum { display: none; }
+.praktikum.active { display: block; }
+.card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+.card h2 { color: #1e3a8a; font-size: 1.1rem; margin-bottom: 10px; border-bottom: 3px solid #2563eb; padding-bottom: 8px; }
+.card h3 { color: #2563eb; font-size: 0.95rem; margin: 14px 0 8px; }
+.card p, .card li { font-size: 0.85rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+input, select, textarea { width: 100%; padding: 9px 11px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px; font-family: inherit; }
+label { font-weight: 600; font-size: 0.8rem; color: #334155; display: block; margin-bottom: 4px; }
+button.btn { background: #2563eb; color: white; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+button.btn:hover { background: #1e40af; }
+button.btn.green { background: #16a34a; } button.btn.green:hover { background: #15803d; }
+button.btn.red { background: #dc2626; } button.btn.red:hover { background: #b91c1c; }
+button.btn.orange { background: #ea580c; } button.btn.orange:hover { background: #c2410c; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.8rem; }
+th { background: #1e3a8a; color: white; padding: 8px; text-align: left; }
+td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
+tr:nth-child(even) td { background: #f8fafc; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; }
+.badge.green { background: #d1fae5; color: #065f46; }
+.badge.red { background: #fee2e2; color: #991b1b; }
+.badge.yellow { background: #fef3c7; color: #92400e; }
+.badge.blue { background: #dbeafe; color: #1e40af; }
+.alert { padding: 10px 14px; border-radius: 8px; margin: 10px 0; font-size: 0.85rem; }
+.alert.info { background: #dbeafe; color: #1e40af; border-left: 4px solid #2563eb; }
+.alert.success { background: #d1fae5; color: #065f46; border-left: 4px solid #16a34a; }
+.alert.warn { background: #fef3c7; color: #92400e; border-left: 4px solid #f59e0b; }
+.alert.error { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+.diagram { display: flex; flex-direction: column; gap: 6px; padding: 14px; background: #f8fafc; border-radius: 8px; border: 2px dashed #cbd5e1; }
+.diagram .row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.diagram .node { padding: 8px 12px; background: white; border: 2px solid #2563eb; border-radius: 8px; font-size: 0.75rem; font-weight: 600; text-align: center; }
+.diagram .arrow { text-align: center; color: #2563eb; font-size: 1rem; }
+.stat { background: linear-gradient(135deg, #2563eb, #1e40af); color: white; padding: 14px; border-radius: 10px; text-align: center; }
+.stat .label { font-size: 0.75rem; opacity: 0.9; }
+.stat .value { font-size: 1.1rem; font-weight: 700; margin-top: 4px; }
+.mono { font-family: 'Courier New', monospace; }
+footer { text-align: center; padding: 16px; color: #64748b; font-size: 0.75rem; background: white; margin-top: 30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Demo Praktikum ERP</h1>
+  <p>Politeknik META Industri — Mode Demo (LocalStorage)</p>
+</header>
+
+<nav>
+  <button class="active" data-target="p1">P1. Integrasi</button>
+  <button data-target="p2">P2. Arsitektur</button>
+  <button data-target="p3">P3. Proses &amp; Approval</button>
+  <button data-target="p4">P4. Keuangan</button>
+  <button data-target="p5">P5. SCM</button>
+  <button data-target="p0" style="border-color:#dc2626;color:#dc2626;">🔄 Reset</button>
+</nav>
+
+<main>
+
+<!-- P1 -->
+<section id="p1" class="praktikum active">
+  <div class="card">
+    <h2>🧩 P1 — Evolusi &amp; Integrasi ERP</h2>
+    <p>Simulasi transaksi pesanan pelanggan dan dampaknya ke stok, produksi, dan keuangan.</p>
+  </div>
+  <div class="card">
+    <h3>Data Departemen &amp; Sistem Lama</h3>
+    <table>
+      <thead><tr><th>Departemen</th><th>Sistem</th><th>Masalah</th></tr></thead>
+      <tbody id="p1-dept"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Diagram Sebelum ERP (As-Is)</h3>
+    <div class="diagram">
+      <div class="row">
+        <div class="node">📈 Penjualan<br><small>Spreadsheet</small></div>
+        <div class="node">📦 Gudang<br><small>Aplikasi Stok</small></div>
+        <div class="node">🏭 Produksi<br><small>Formulir</small></div>
+        <div class="node">💰 Keuangan<br><small>Akuntansi</small></div>
+      </div>
+      <div class="arrow">❌ Data silo (tidak terhubung)</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Diagram Sesudah ERP (To-Be)</h3>
+    <div class="diagram">
+      <div class="row">
+        <div class="node">📈 Penjualan</div><div class="node">📦 Gudang</div>
+        <div class="node">🏭 Produksi</div><div class="node">💰 Keuangan</div>
+      </div>
+      <div class="arrow">⬇️</div>
+      <div class="row"><div class="node" style="border-color:#16a34a;background:#d1fae5;">🗄️ Database Terpusat (ERP)</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Data Master Bersama</h3>
+    <table>
+      <thead><tr><th>Kode</th><th>Nama</th><th>Tipe</th><th>Pemilik</th><th>Pengguna</th></tr></thead>
+      <tbody id="p1-master"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Simulasi Pesanan Pelanggan</h3>
+    <div class="grid-2">
+      <div>
+        <label>Pelanggan</label><input id="p1-pel" value="PT Maju Jaya">
+        <label>Produk</label><input id="p1-prod" value="Produk Jadi A">
+        <label>Jumlah</label><input type="number" id="p1-jml" value="10" min="1">
+        <label>Harga Satuan (Rp)</label><input type="number" id="p1-hrg" value="100000">
+        <label>Tantangan</label>
+        <select id="p1-tant">
+          <option value="">-- Tidak ada --</option>
+          <option value="stok_kurang">1) Stok bahan baku tidak mencukupi</option>
+          <option value="ubah_jumlah">2) Pelanggan mengubah jumlah pesanan</option>
+          <option value="belum_bayar">3) Pembayaran belum diterima</option>
+          <option value="produksi_telat">4) Produksi terlambat</option>
+        </select>
+        <button class="btn green" onclick="p1Simulasi()">🚀 Simulasikan</button>
+      </div>
+      <div id="p1-hasil"><div class="alert info">Klik "Simulasikan" untuk lihat dampak.</div></div>
+    </div>
+    <h3 style="margin-top:16px;">Riwayat Simulasi</h3>
+    <table>
+      <thead><tr><th>No</th><th>Pelanggan</th><th>Jumlah</th><th>Total</th><th>Status</th><th>Dampak Stok</th><th>Dampak Produksi</th><th>Dampak Keuangan</th></tr></thead>
+      <tbody id="p1-riwayat"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- P2 -->
+<section id="p2" class="praktikum">
+  <div class="card">
+    <h2>🏗️ P2 — Arsitektur Teknis ERP</h2>
+    <p>Arsitektur untuk 100 pengguna di 5 departemen.</p>
+  </div>
+  <div class="card">
+    <h3>Diagram Arsitektur</h3>
+    <div class="diagram">
+      <div class="row"><div class="node">👥 100 Pengguna (Browser)</div></div>
+      <div class="arrow">⬇️</div>
+      <div class="row"><div class="node">🌐 Antarmuka Web (UI)</div></div>
+      <div class="arrow">⬇️</div>
+      <div class="row"><div class="node">⚙️ Server Aplikasi + Load Balancer</div></div>
+      <div class="arrow">⬇️</div>
+      <div class="row">
+        <div class="node">🗄️ MySQL (Master-Slave)</div>
+        <div class="node">💾 Backup Harian</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Matriks Hak Akses</h3>
+    <table>
+      <thead><tr><th>Departemen</th><th>Penjualan</th><th>Gudang</th><th>Produksi</th><th>Pembelian</th><th>Keuangan</th></tr></thead>
+      <tbody id="p2-akses"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Backup &amp; Pemulihan</h3>
+    <div class="grid-3">
+      <div class="stat"><div class="label">Frekuensi</div><div class="value">Harian 00:00</div></div>
+      <div class="stat"><div class="label">Retensi</div><div class="value">30 Hari</div></div>
+      <div class="stat"><div class="label">RPO / RTO</div><div class="value">24 jam / 2 jam</div></div>
+    </div>
+    <button class="btn" style="margin-top:10px;" onclick="p2Backup()">💾 Simulasikan Backup</button>
+    <div id="p2-backup"></div>
+  </div>
+  <div class="card">
+    <h3>Simulasi Gangguan</h3>
+    <select id="p2-g">
+      <option value="G1">G1 — Database tidak dapat diakses</option>
+      <option value="G2">G2 — Server aplikasi gangguan</option>
+      <option value="G3">G3 — Koneksi internet terputus</option>
+      <option value="G4">G4 — Pengguna tidak berwenang</option>
+      <option value="G5">G5 — Data transaksi hilang</option>
+    </select>
+    <button class="btn orange" onclick="p2Gangguan()">⚠️ Tampilkan Penanganan</button>
+    <div id="p2-ghasil"></div>
+  </div>
+</section>
+
+<!-- P3 -->
+<section id="p3" class="praktikum">
+  <div class="card">
+    <h2>📋 P3 — Proses Bisnis &amp; Alur Persetujuan</h2>
+    <p>Rancangan proses pembelian bahan praktikum Laboratorium META Industri.</p>
+  </div>
+  <div class="card">
+    <h3>Diagram As-Is (Manual)</h3>
+    <div class="diagram">
+      <div class="row"><div class="node">1. Dosen ajukan</div></div><div class="arrow">⬇️ ⚠️</div>
+      <div class="row"><div class="node">2. Kepala Lab verifikasi</div></div><div class="arrow">⬇️ ⚠️</div>
+      <div class="row"><div class="node">3. Gudang cek stok</div></div><div class="arrow">⬇️ ⚠️</div>
+      <div class="row"><div class="node">4. Pembelian pilih pemasok</div></div><div class="arrow">⬇️ ⚠️</div>
+      <div class="row"><div class="node">5. Pimpinan setujui</div></div><div class="arrow">⬇️ ⚠️</div>
+      <div class="row"><div class="node">6. Gudang terima</div></div><div class="arrow">⬇️ ⚠️</div>
+      <div class="row"><div class="node">7. Keuangan bayar</div></div>
+    </div>
+    <div class="alert warn">⚠️ Risiko: tidak ada tracking, approval bisa terlewat, data tidak sinkron.</div>
+  </div>
+  <div class="card">
+    <h3>Diagram To-Be (ERP)</h3>
+    <div class="diagram">
+      <div class="row"><div class="node" style="border-color:#16a34a;">1. Dosen ajukan via sistem</div></div><div class="arrow">⬇️</div>
+      <div class="row"><div class="node" style="border-color:#16a34a;">2. Kepala Lab verifikasi online</div></div><div class="arrow">⬇️</div>
+      <div class="row"><div class="node" style="border-color:#16a34a;">3. Sistem cek stok otomatis</div></div><div class="arrow">⬇️</div>
+      <div class="row"><div class="node" style="border-color:#16a34a;">4. Rekomendasi pemasok</div></div><div class="arrow">⬇️</div>
+      <div class="row"><div class="node" style="border-color:#16a34a;">5. Approval digital multi-level</div></div><div class="arrow">⬇️</div>
+      <div class="row"><div class="node" style="border-color:#16a34a;">6. PO otomatis</div></div><div class="arrow">⬇️</div>
+      <div class="row"><div class="node" style="border-color:#16a34a;">7. Penerimaan &amp; pembayaran tercatat</div></div>
+    </div>
+    <div class="alert success">✅ Semua tercatat &amp; dapat diaudit.</div>
+  </div>
+  <div class="card">
+    <h3>Aturan Bisnis</h3>
+    <table>
+      <thead><tr><th>Kode</th><th>Aturan</th><th>Kategori</th></tr></thead>
+      <tbody id="p3-aturan"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Aktor &amp; Tanggung Jawab</h3>
+    <table>
+      <thead><tr><th>Aktor</th><th>Tanggung Jawab</th><th>Tahap</th></tr></thead>
+      <tbody id="p3-aktor"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Buat Permintaan Pembelian</h3>
+    <div class="grid-2">
+      <div>
+        <label>Pengaju</label><input id="p3-peng" value="Dosen">
+        <label>Nama Barang</label><input id="p3-brg" value="Bahan Praktikum A">
+        <label>Jumlah</label><input type="number" id="p3-jml" value="50">
+        <label>Stok Tersedia</label><input type="number" id="p3-stk" value="20">
+        <label>Nilai Awal (Rp)</label><input type="number" id="p3-nil" value="1000000">
+        <button class="btn green" onclick="p3Buat()">📝 Ajukan</button>
+      </div>
+      <div id="p3-hasil"></div>
+    </div>
+    <h3 style="margin-top:14px;">Daftar Permintaan</h3>
+    <table>
+      <thead><tr><th>ID</th><th>No</th><th>Pengaju</th><th>Barang</th><th>Jumlah</th><th>Stok</th><th>Status</th><th>Nilai Awal</th><th>Nilai Baru</th><th>Approval Ulang?</th></tr></thead>
+      <tbody id="p3-list"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Simulasi Nilai Naik (R5: &gt;10% → Approval Ulang)</h3>
+    <div class="grid-2">
+      <div>
+        <label>ID Permintaan</label><input type="number" id="p3-id" placeholder="Contoh: 1">
+        <label>Nilai Penawaran Baru (Rp)</label><input type="number" id="p3-nbaru" value="1300000">
+        <button class="btn orange" onclick="p3Naik()">📈 Proses</button>
+      </div>
+      <div id="p3-nhasil"><div class="alert info">Aturan R5: jika naik &gt;10%, approval harus diulang.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- P4 -->
+<section id="p4" class="praktikum">
+  <div class="card">
+    <h2>💰 P4 — Modul Keuangan</h2>
+    <p>Saldo awal kas: <strong>Rp 30.000.000</strong></p>
+  </div>
+  <div class="card">
+    <h3>Chart of Accounts</h3>
+    <table>
+      <thead><tr><th>Kode</th><th>Nama Akun</th><th>Tipe</th><th>Saldo Normal</th></tr></thead>
+      <tbody id="p4-akun"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Jurnal Transaksi</h3>
+    <table>
+      <thead><tr><th>ID</th><th>No</th><th>Keterangan</th><th>Debit</th><th>Kredit</th><th>Nilai</th><th>Status</th></tr></thead>
+      <tbody id="p4-jurnal"></tbody>
+    </table>
+    <div class="grid-3" style="margin-top:10px;">
+      <button class="btn red" onclick="p4Dup()">🔁 Duplikasi T4</button>
+      <button class="btn orange" onclick="p4Kor()">🛠️ Koreksi</button>
+      <button class="btn green" onclick="renderP4()">🔄 Refresh</button>
+    </div>
+    <div id="p4-info"></div>
+  </div>
+  <div class="card">
+    <h3>Neraca Saldo</h3>
+    <div class="grid-3" style="margin-bottom:10px;">
+      <div class="stat"><div class="label">Kas Akhir</div><div class="value" id="p4-kas">Rp 30.000.000</div></div>
+      <div class="stat"><div class="label">Total Debit</div><div class="value" id="p4-td">Rp 0</div></div>
+      <div class="stat"><div class="label">Total Kredit</div><div class="value" id="p4-tk">Rp 0</div></div>
+    </div>
+    <table>
+      <thead><tr><th>Kode</th><th>Nama Akun</th><th>Tipe</th><th>Debit</th><th>Kredit</th><th>Saldo</th></tr></thead>
+      <tbody id="p4-neraca"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Penjelasan Hubungan Transaksi → Saldo</h3>
+    <ul style="padding-left:18px;">
+      <li><strong>T1 (Kredit Rp8jt):</strong> Persediaan (D) +8jt, Utang (K) +8jt</li>
+      <li><strong>T2 (Bayar utang Rp3jt):</strong> Utang (D) -3jt, Kas (K) -3jt</li>
+      <li><strong>T3 (Jual kredit Rp12jt):</strong> Piutang (D) +12jt, Penjualan (K) +12jt</li>
+      <li><strong>T4 (Terima Rp5jt):</strong> Kas (D) +5jt, Piutang (K) -5jt</li>
+      <li><strong>T5 (Beban Rp1,5jt):</strong> Beban (D) +1,5jt, Kas (K) -1,5jt</li>
+    </ul>
+  </div>
+</section>
+
+<!-- P5 -->
+<section id="p5" class="praktikum">
+  <div class="card">
+    <h2>📦 P5 — SCM &amp; Pembelian</h2>
+    <p>Produksi 300 unit → 3× Bahan A + 2× Bahan B per unit.</p>
+  </div>
+  <div class="card">
+    <h3>Data Master Bahan</h3>
+    <table>
+      <thead><tr><th>Kode</th><th>Nama</th><th>Stok</th><th>On-Order</th><th>Lead Time</th><th>Satuan</th></tr></thead>
+      <tbody id="p5-bahan"></tbody>
+    </table>
+    <h3 style="margin-top:14px;">Bill of Materials</h3>
+    <table>
+      <thead><tr><th>Produk</th><th>Bahan</th><th>Qty/Unit</th></tr></thead>
+      <tbody id="p5-bom"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Perhitungan MRP</h3>
+    <label>Jumlah Produksi</label><input type="number" id="p5-prod" value="300">
+    <button class="btn" onclick="p5Hitung()">🧮 Hitung Kebutuhan</button>
+    <div id="p5-hasil"></div>
+  </div>
+  <div class="card">
+    <h3>Buat Purchase Order</h3>
+    <div class="grid-2">
+      <div>
+        <label>Bahan</label>
+        <select id="p5-pob">
+          <option value="BAHAN-A">Bahan A</option>
+          <option value="BAHAN-B">Bahan B</option>
+        </select>
+        <label>Jumlah Pesan</label><input type="number" id="p5-poj" value="500">
+        <button class="btn green" onclick="p5PO()">📤 Buat PO</button>
+      </div>
+      <div id="p5-poh"></div>
+    </div>
+    <h3 style="margin-top:14px;">Daftar PO</h3>
+    <table>
+      <thead><tr><th>ID</th><th>No PO</th><th>Bahan</th><th>Jumlah</th><th>Diterima</th><th>Status</th></tr></thead>
+      <tbody id="p5-polst"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Penerimaan Barang</h3>
+    <div class="grid-2">
+      <div>
+        <label>ID PO</label><input type="number" id="p5-tid" placeholder="Contoh: 1">
+        <label>Jumlah Diterima</label><input type="number" id="p5-tjml" value="200">
+        <button class="btn green" onclick="p5Terima()">📥 Terima</button>
+      </div>
+      <div id="p5-th"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Analisis Keterlambatan Bahan B</h3>
+    <div class="alert warn">Pemasok Bahan B kirim 8 hari, produksi harus 6 hari.</div>
+    <button class="btn orange" onclick="p5Analisis()">🧠 Tampilkan Analisis</button>
+    <div id="p5-analisis"></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>© 2025 Demo Praktikum ERP — Politeknik META Industri | Data tersimpan di LocalStorage browser</p>
+</footer>
+
+<script>
+/* ===== UTIL ===== */
+const Rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+const LS = {
+  get: (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+  del: k => localStorage.removeItem(k)
+};
+
+function initData() {
+  if (!LS.get('p1_pesanan')) LS.set('p1_pesanan', []);
+  if (!LS.get('p2_backup')) LS.set('p2_backup', []);
+  if (!LS.get('p3_permintaan')) LS.set('p3_permintaan', []);
+  if (!LS.get('p4_jurnal')) LS.set('p4_jurnal', [
+    {id:1,no:'T1',ket:'Pembelian bahan baku kredit',d:'103',k:'201',nilai:8000000,status:'valid'},
+    {id:2,no:'T2',ket:'Pembayaran utang pemasok',d:'201',k:'101',nilai:3000000,status:'valid'},
+    {id:3,no:'T3',ket:'Penjualan produk kredit',d:'102',k:'401',nilai:12000000,status:'valid'},
+    {id:4,no:'T4',ket:'Penerimaan pembayaran pelanggan',d:'101',k:'102',nilai:5000000,status:'valid'},
+    {id:5,no:'T5',ket:'Pembayaran beban operasional',d:'501',k:'101',nilai:1500000,status:'valid'}
+  ]);
+  if (!LS.get('p5_po')) LS.set('p5_po', []);
+  if (!LS.get('p5_bahan')) LS.set('p5_bahan', [
+    {kode:'BAHAN-A',nama:'Bahan A',stok:400,on_order:100,lead:4,satuan:'unit'},
+    {kode:'BAHAN-B',nama:'Bahan B',stok:250,on_order:0,lead:7,satuan:'unit'}
+  ]);
+}
+
+/* ===== NAVIGASI ===== */
+document.querySelectorAll('nav button').forEach(b => {
+  b.addEventListener('click', () => {
+    if (b.dataset.target === 'p0') {
+      if (confirm('Reset semua data?')) {
+        ['p1_pesanan','p2_backup','p3_permintaan','p4_jurnal','p5_po','p5_bahan'].forEach(k => LS.del(k));
+        initData(); renderAll();
+        alert('✅ Data direset');
+      }
+      return;
+    }
+    document.querySelectorAll('nav button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('.praktikum').forEach(s => s.classList.remove('active'));
+    document.getElementById(b.dataset.target).classList.add('active');
+    renderAll();
+  });
+});
+
+/* ===== RENDER ALL ===== */
+function renderAll() { renderP1(); renderP2(); renderP3(); renderP4(); renderP5(); }
+
+/* ===== P1 ===== */
+function renderP1() {
+  const dept = [
+    {nama:'Penjualan', sistem:'Spreadsheet', masalah:'Data pesanan terlambat diperbarui'},
+    {nama:'Gudang', sistem:'Aplikasi stok', masalah:'Stok berbeda dengan catatan pembelian'},
+    {nama:'Produksi', sistem:'Formulir manual', masalah:'Jadwal produksi sering berubah'},
+    {nama:'Keuangan', sistem:'Aplikasi akuntansi', masalah:'Transaksi harus dimasukkan ulang'}
+  ];
+  document.getElementById('p1-dept').innerHTML = dept.map(d =>
+    '<tr><td>' + d.nama + '</td><td>' + d.sistem + '</td><td>' + d.masalah + '</td></tr>').join('');
+
+  const master = [
+    {kode:'CUST-001', nama:'PT Maju Jaya', tipe:'Pelanggan', pemilik:'Penjualan', pengguna:'Penjualan, Keuangan'},
+    {kode:'PROD-001', nama:'Produk Jadi A', tipe:'Produk', pemilik:'Produksi', pengguna:'Penjualan, Gudang, Produksi'},
+    {kode:'SUP-001', nama:'CV Sumber Bahan', tipe:'Pemasok', pemilik:'Pembelian', pengguna:'Pembelian, Gudang, Keuangan'},
+    {kode:'BAHAN-A', nama:'Bahan A', tipe:'Bahan Baku', pemilik:'Gudang', pengguna:'Gudang, Produksi, Pembelian'},
+    {kode:'BAHAN-B', nama:'Bahan B', tipe:'Bahan Baku', pemilik:'Gudang', pengguna:'Gudang, Produksi, Pembelian'}
+  ];
+  document.getElementById('p1-master').innerHTML = master.map(m =>
+    '<tr><td>' + m.kode + '</td><td>' + m.nama + '</td><td>' + m.tipe + '</td><td>' + m.pemilik + '</td><td>' + m.pengguna + '</td></tr>').join('');
+
+  const list = LS.get('p1_pesanan', []);
+  document.getElementById('p1-riwayat').innerHTML = list.length ? list.map(p =>
+    '<tr><td class="mono">' + p.no + '</td><td>' + p.pel + '</td><td>' + p.jml + '</td><td>' + Rp(p.total) + '</td><td><span class="badge blue">' + p.status + '</span></td><td>' + p.stok + '</td><td>' + p.prod + '</td><td>' + p.keu + '</td></tr>'
+  ).join('') : '<tr><td colspan="8" style="text-align:center;color:#999;">Belum ada data</td></tr>';
+}
+
+function p1Simulasi() {
+  const pel = document.getElementById('p1-pel').value;
+  const prod = document.getElementById('p1-prod').value;
+  const jml = +document.getElementById('p1-jml').value;
+  const hrg = +document.getElementById('p1-hrg').value;
+  const tant = document.getElementById('p1-tant').value;
+  const total = jml * hrg;
+
+  let stok = jml + ' unit berkurang';
+  let prd = 'Produksi dijadwalkan ' + jml + ' unit';
+  let keu = 'Piutang +' + Rp(total);
+  let status = 'dikonfirmasi';
+
+  if (tant === 'stok_kurang') { stok = 'Stok kurang! Perlu +50 unit bahan'; prd = 'Produksi ditunda'; keu = 'Biaya naik: ' + Rp(total + 500000); status = 'draft'; }
+  else if (tant === 'ubah_jumlah') { prd = 'Jadwal diubah untuk ' + jml + ' unit'; }
+  else if (tant === 'belum_bayar') { keu = 'Belum ada penerimaan kas'; status = 'draft'; }
+  else if (tant === 'produksi_telat') { prd = 'Produksi terlambat +3 hari'; status = 'produksi'; }
+
+  const no = 'SO-' + Date.now().toString().slice(-8);
+  const list = LS.get('p1_pesanan', []);
+  list.unshift({no, pel, prod, jml, hrg, total, stok, prod: prd, keu, status});
+  LS.set('p1_pesanan', list);
+
+  document.getElementById('p1-hasil').innerHTML =
+    '<div class="alert success"><strong>✅ Pesanan ' + no + ' dibuat</strong><br>' +
+    '<strong>Dampak Stok:</strong> ' + stok + '<br>' +
+    '<strong>Dampak Produksi:</strong> ' + prd + '<br>' +
+    '<strong>Dampak Keuangan:</strong> ' + keu + '<br>' +
+    '<strong>Status:</strong> ' + status + '</div>' +
+    '<div class="alert info">ERP mengintegrasikan data ke 3 departemen tanpa input ulang.</div>';
+  renderP1();
+}
+
+/* ===== P2 ===== */
+function renderP2() {
+  const akses = [
+    {d:'Penjualan', pj:1, gd:0, pr:0, pb:0, ku:0},
+    {d:'Gudang', pj:1, gd:1, pr:1, pb:1, ku:0},
+    {d:'Produksi', pj:0, gd:1, pr:1, pb:0, ku:0},
+    {d:'Pembelian', pj:0, gd:1, pr:0, pb:1, ku:1},
+    {d:'Keuangan', pj:1, gd:0, pr:0, pb:1, ku:1},
+    {d:'Admin', pj:1, gd:1, pr:1, pb:1, ku:1}
+  ];
+  const chk = v => v ? '<span class="badge green">✓</span>' : '<span class="badge red">✗</span>';
+  document.getElementById('p2-akses').innerHTML = akses.map(a =>
+    '<tr><td><strong>' + a.d + '</strong></td><td>' + chk(a.pj) + '</td><td>' + chk(a.gd) + '</td><td>' + chk(a.pr) + '</td><td>' + chk(a.pb) + '</td><td>' + chk(a.ku) + '</td></tr>').join('');
+
+  const logs = LS.get('p2_backup', []);
+  document.getElementById('p2-backup').innerHTML = logs.length ?
+    '<h3 style="margin-top:14px;">Riwayat Backup</h3><table><thead><tr><th>Waktu</th><th>Jenis</th><th>Lokasi</th><th>Status</th></tr></thead><tbody>' +
+    logs.map(b => '<tr><td>' + new Date(b.waktu).toLocaleString('id-ID') + '</td><td>' + b.jenis + '</td><td class="mono">' + b.lokasi + '</td><td><span class="badge green">' + b.status + '</span></td></tr>').join('') +
+    '</tbody></table>' : '';
+}
+
+function p2Backup() {
+  const logs = LS.get('p2_backup', []);
+  logs.unshift({
+    waktu: new Date().toISOString(),
+    jenis: 'full',
+    lokasi: '/backup/erp_' + new Date().toISOString().slice(0,10) + '.sql',
+    ukuran: Math.floor(Math.random()*150)+30,
+    status: 'sukses'
+  });
+  LS.set('p2_backup', logs);
+  renderP2();
+  alert('✅ Backup full berhasil');
+}
+
+const gangguan = {
+  G1: {n:'Database tidak dapat diakses', p:'1. Cek service MySQL<br>2. Restore dari backup<br>3. Gunakan read-replica', d:'Transaksi tertunda, data master tidak terbaca'},
+  G2: {n:'Server aplikasi gangguan', p:'1. Failover ke server cadangan<br>2. Restart service', d:'Akses pengguna terputus sementara'},
+  G3: {n:'Koneksi internet terputus', p:'1. Backup link 4G<br>2. Mode offline terbatas', d:'Akses eksternal terganggu'},
+  G4: {n:'Pengguna tidak berwenang', p:'1. Cek RBAC<br>2. Audit log<br>3. Blokir sesi', d:'Potensi kebocoran data keuangan'},
+  G5: {n:'Data transaksi hilang', p:'1. Restore point<br>2. Audit log<br>3. Investigasi', d:'Kehilangan data sejak backup'}
+};
+
+function p2Gangguan() {
+  const g = document.getElementById('p2-g').value;
+  const d = gangguan[g];
+  document.getElementById('p2-ghasil').innerHTML =
+    '<div class="alert warn"><strong>⚠️ ' + d.n + '</strong><br><br>' +
+    '<strong>Penanganan:</strong><br>' + d.p + '<br><br>' +
+    '<strong>Dampak:</strong> ' + d.d + '</div>';
+}
+
+/* ===== P3 ===== */
+const aturanP3 = [
+  {kode:'R1', aturan:'Permintaan harus memiliki identitas pengaju', kat:'Validasi'},
+  {kode:'R2', aturan:'Permintaan pembelian harus diperiksa terhadap stok', kat:'Stok'},
+  {kode:'R3', aturan:'Pesanan pembelian harus disetujui pihak berwenang', kat:'Approval'},
+  {kode:'R4', aturan:'Pembayaran harus didukung dokumen yang sesuai', kat:'Keuangan'},
+  {kode:'R5', aturan:'Jika nilai naik > 10% dari nilai awal, approval harus diulang', kat:'Approval'}
+];
+const aktorP3 = [
+  {a:'Dosen', t:'Mengajukan permintaan bahan', tah:'Pengajuan'},
+  {a:'Kepala Laboratorium', t:'Memverifikasi kebutuhan', tah:'Verifikasi'},
+  {a:'Gudang', t:'Memeriksa stok & menerima barang', tah:'Cek Stok & Penerimaan'},
+  {a:'Bagian Pembelian', t:'Memilih pemasok', tah:'Pengadaan'},
+  {a:'Pimpinan', t:'Memberikan persetujuan', tah:'Persetujuan'},
+  {a:'Keuangan', t:'Memproses pembayaran', tah:'Pembayaran'}
+];
+
+function renderP3() {
+  document.getElementById('p3-aturan').innerHTML = aturanP3.map(a =>
+    '<tr><td><strong>' + a.kode + '</strong></td><td>' + a.aturan + '</td><td><span class="badge blue">' + a.kat + '</span></td></tr>').join('');
+  document.getElementById('p3-aktor').innerHTML = aktorP3.map(a =>
+    '<tr><td>' + a.a + '</td><td>' + a.t + '</td><td>' + a.tah + '</td></tr>').join('');
+
+  const list = LS.get('p3_permintaan', []);
+  document.getElementById('p3-list').innerHTML = list.length ? list.map(p => {
+    const badge = p.status === 'disetujui' ? 'green' : p.status === 'ditolak' ? 'red' : 'yellow';
+    return '<tr><td>' + p.id + '</td><td class="mono">' + p.no + '</td><td>' + p.pengaju + '</td><td>' + p.barang + '</td><td>' + p.jumlah + '</td><td>' + p.stok + '</td><td><span class="badge ' + badge + '">' + p.status + '</span></td><td>' + Rp(p.nilai_awal) + '</td><td>' + (p.nilai_baru ? Rp(p.nilai_baru) : '-') + '</td><td>' + (p.perlu_ulang ? '<span class="badge red">Ya</span>' : '<span class="badge green">Tidak</span>') + '</td></tr>';
+  }).join('') : '<tr><td colspan="10" style="text-align:center;color:#999;">Belum ada permintaan</td></tr>';
+}
+
+function p3Buat() {
+  const pengaju = document.getElementById('p3-peng').value.trim();
+  if (!pengaju) {
+    document.getElementById('p3-hasil').innerHTML = '<div class="alert error">❌ R1: Identitas pengaju wajib diisi!</div>';
+    return;
+  }
+  const barang = document.getElementById('p3-brg').value;
+  const jumlah = +document.getElementById('p3-jml').value;
+  const stok = +document.getElementById('p3-stk').value;
+  const nilai = +document.getElementById('p3-nil').value;
+
+  const list = LS.get('p3_permintaan', []);
+  const id = list.length + 1;
+  const no = 'PR-' + Date.now().toString().slice(-8);
+  const status = stok >= jumlah ? 'disetujui' : 'pilih_pemasok';
+
+  list.push({id, no, pengaju, barang, jumlah, stok, nilai_awal: nilai, nilai_baru: 0, perlu_ulang: 0, status});
+  LS.set('p3_permintaan', list);
+
+  document.getElementById('p3-hasil').innerHTML = stok >= jumlah
+    ? '<div class="alert success">✅ R2 terpenuhi: stok ' + stok + ' ≥ ' + jumlah + '. Permintaan disetujui.<br>No: <strong>' + no + '</strong></div>'
+    : '<div class="alert warn">⚠️ R2: stok ' + stok + ' < ' + jumlah + '. Perlu beli ' + (jumlah - stok) + ' unit.<br>Status: ' + status + '<br>No: <strong>' + no + '</strong></div>';
+  renderP3();
+}
+
+function p3Naik() {
+  const id = +document.getElementById('p3-id').value;
+  const baru = +document.getElementById('p3-nbaru').value;
+  const list = LS.get('p3_permintaan', []);
+  const p = list.find(x => x.id === id);
+  if (!p) {
+    document.getElementById('p3-nhasil').innerHTML = '<div class="alert error">❌ Permintaan tidak ditemukan</div>';
+    return;
+  }
+  const persen = ((baru - p.nilai_awal) / p.nilai_awal * 100).toFixed(2);
+  const ulang = persen > 10;
+
+  p.nilai_baru = baru;
+  p.perlu_ulang = ulang ? 1 : 0;
+  if (ulang) p.status = 'persetujuan';
+  LS.set('p3_permintaan', list);
+
+  document.getElementById('p3-nhasil').innerHTML =
+    '<div class="alert ' + (ulang ? 'warn' : 'success') + '">' +
+    '<strong>Nilai awal:</strong> ' + Rp(p.nilai_awal) + '<br>' +
+    '<strong>Nilai baru:</strong> ' + Rp(baru) + '<br>' +
+    '<strong>Kenaikan:</strong> ' + persen + '%<br>' +
+    '<strong>Keputusan:</strong> ' + (ulang ? '🔁 >10% → <b>Approval ulang WAJIB</b> (R5)' : '✅ ≤10% → Approval sebelumnya masih berlaku') +
+    '</div>';
+  renderP3();
+}
+
+/* ===== P4 ===== */
+const akunP4 = [
+  {k:'101', n:'Kas', t:'Aset', sn:'Debit'},
+  {k:'102', n:'Piutang Usaha', t:'Aset', sn:'Debit'},
+  {k:'103', n:'Persediaan', t:'Aset', sn:'Debit'},
+  {k:'201', n:'Utang Usaha', t:'Kewajiban', sn:'Kredit'},
+  {k:'401', n:'Penjualan', t:'Pendapatan', sn:'Kredit'},
+  {k:'501', n:'Beban Operasional', t:'Beban', sn:'Debit'}
+];
+
+function renderP4() {
+  document.getElementById('p4-akun').innerHTML = akunP4.map(a =>
+    '<tr><td>' + a.k + '</td><td>' + a.n + '</td><td>' + a.t + '</td><td>' + a.sn + '</td></tr>').join('');
+
+  const jurnal = LS.get('p4_jurnal', []);
+  document.getElementById('p4-jurnal').innerHTML = jurnal.map(j => {
+    const b = j.status === 'valid' ? 'green' : j.status === 'duplikat' ? 'red' : 'yellow';
+    return '<tr><td>' + j.id + '</td><td>' + j.no + '</td><td>' + j.ket + '</td><td>' + j.d + '</td><td>' + j.k + '</td><td>' + Rp(j.nilai) + '</td><td><span class="badge ' + b + '">' + j.status + '</span></td></tr>';
+  }).join('');
+
+  const saldo = akunP4.map(a => {
+    const deb = jurnal.filter(j => j.d === a.k && j.status === 'valid').reduce((s, j) => s + j.nilai, 0);
+    const kre = jurnal.filter(j => j.k === a.k && j.status === 'valid').reduce((s, j) => s + j.nilai, 0);
+    const sal = a.sn === 'Debit' ? deb - kre : kre - deb;
+    return {...a, deb, kre, sal};
+  });
+
+  document.getElementById('p4-neraca').innerHTML = saldo.map(s =>
+    '<tr><td>' + s.k + '</td><td>' + s.n + '</td><td>' + s.t + '</td><td>' + Rp(s.deb) + '</td><td>' + Rp(s.kre) + '</td><td><strong>' + Rp(s.sal) + '</strong></td></tr>').join('');
+
+  document.getElementById('p4-td').textContent = Rp(saldo.reduce((s, a) => s + a.deb, 0));
+  document.getElementById('p4-tk').textContent = Rp(saldo.reduce((s, a) => s + a.kre, 0));
+
+  const kd = jurnal.filter(j => j.d === '101' && j.status === 'valid').reduce((s, j) => s + j.nilai, 0);
+  const kk = jurnal.filter(j => j.k === '101' && j.status === 'valid').reduce((s, j) => s + j.nilai, 0);
+  document.getElementById('p4-kas').textContent = Rp(30000000 + kd - kk);
+}
+
+function p4Dup() {
+  const jurnal = LS.get('p4_jurnal', []);
+  const t4 = jurnal.find(j => j.no === 'T4' && j.status === 'valid');
+  if (!t4) return;
+  const id = Math.max(...jurnal.map(j => j.id)) + 1;
+  jurnal.push({id, no:'T4', ket:'DUPLIKAT - ' + t4.ket, d:t4.d, k:t4.k, nilai:t4.nilai, status:'duplikat'});
+  LS.set('p4_jurnal', jurnal);
+  document.getElementById('p4-info').innerHTML =
+    '<div class="alert error"><strong>🔁 Duplikat terdeteksi!</strong><br>' +
+    'Transaksi T4 dicatat ulang Rp ' + t4.nilai.toLocaleString('id-ID') + '.<br>' +
+    'Dampak: Kas (D) & Piutang (K) bertambah — saldo TIDAK seimbang jika tidak dikoreksi.<br>' +
+    'Klik <b>Koreksi</b> untuk memperbaiki.</div>';
+  renderP4();
+}
+
+function p4Kor() {
+  const jurnal = LS.get('p4_jurnal', []);
+  const dup = jurnal.find(j => j.status === 'duplikat');
+  if (!dup) {
+    document.getElementById('p4-info').innerHTML = '<div class="alert info">Tidak ada duplikat untuk dikoreksi.</div>';
+    return;
+  }
+  dup.status = 'dikoreksi';
+  dup.ket += ' [DIKOREKSI]';
+  LS.set('p4_jurnal', jurnal);
+  document.getElementById('p4-info').innerHTML =
+    '<div class="alert success"><strong>🛠️ Koreksi berhasil.</strong><br>' +
+    'Transaksi ID #' + dup.id + ' ditandai <b>dikoreksi</b> (tidak dihapus) → dapat diaudit.<br>' +
+    'Saldo kembali seimbang.</div>';
+  renderP4();
+}
+
+/* ===== P5 ===== */
+function renderP5() {
+  const bahan = LS.get('p5_bahan', []);
+  document.getElementById('p5-bahan').innerHTML = bahan.map(b =>
+    '<tr><td>' + b.kode + '</td><td>' + b.nama + '</td><td>' + b.stok + '</td><td>' + b.on_order + '</td><td>' + b.lead + ' hari</td><td>' + b.satuan + '</td></tr>').join('');
+
+  document.getElementById('p5-bom').innerHTML =
+    '<tr><td>Produk Jadi A</td><td>Bahan A</td><td>3</td></tr>' +
+    '<tr><td>Produk Jadi A</td><td>Bahan B</td><td>2</td></tr>';
+
+  const po = LS.get('p5_po', []);
+  document.getElementById('p5-polst').innerHTML = po.length ? po.map(p => {
+    const b = p.status === 'diterima_penuh' ? 'green' : p.status === 'diterima_sebagian' ? 'yellow' : 'blue';
+    return '<tr><td>' + p.id + '</td><td class="mono">' + p.no + '</td><td>' + p.bahan + '</td><td>' + p.jumlah + '</td><td>' + p.diterima + '</td><td><span class="badge ' + b + '">' + p.status + '</span></td></tr>';
+  }).join('') : '<tr><td colspan="6" style="text-align:center;color:#999;">Belum ada PO</td></tr>';
+}
+
+function p5Hitung() {
+  const qty = +document.getElementById('p5-prod').value;
+  const bahan = LS.get('p5_bahan', []);
+  const bom = [{bahan:'BAHAN-A', qty:3}, {bahan:'BAHAN-B', qty:2}];
+
+  let html = '<table><thead><tr><th>Bahan</th><th>Qty/Unit</th><th>Bruto</th><th>Stok</th><th>On-Order</th><th>Netto</th><th>Status</th></tr></thead><tbody>';
+  bom.forEach(b => {
+    const info = bahan.find(x => x.kode === b.bahan);
+    const bruto = qty * b.qty;
+    const tersedia = info.stok + info.on_order;
+    const netto = Math.max(0, bruto - tersedia);
+    const cukup = netto === 0;
+    html += '<tr><td><strong>' + info.nama + '</strong></td><td>' + b.qty + '</td><td>' + bruto + '</td><td>' + info.stok + '</td><td>' + info.on_order + '</td><td>' + netto + '</td><td>' + (cukup ? '<span class="badge green">✅ Cukup</span>' : '<span class="badge red">⚠️ Pesan ' + netto + '</span>') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  html += '<div class="alert info"><strong>Asumsi:</strong> On-order boleh dipakai jika lead time masih memenuhi target 6 hari.<br><strong>Target:</strong> Produksi 6 hari. Bahan A (4 hari) ✅, Bahan B (7 hari) ⚠️.</div>';
+  document.getElementById('p5-hasil').innerHTML = html;
+}
+
+function p5PO() {
+  const bahan = document.getElementById('p5-pob').value;
+  const jumlah = +document.getElementById('p5-poj').value;
+  const list = LS.get('p5_po', []);
+  const id = list.length + 1;
+  const no = 'PO-' + Date.now().toString().slice(-8);
+  list.push({id, no, bahan, jumlah, diterima:0, status:'dikirim'});
+  LS.set('p5_po', list);
+  document.getElementById('p5-poh').innerHTML = '<div class="alert success">✅ PO ' + no + ' dibuat untuk ' + jumlah + ' unit ' + bahan + '.</div>';
+  renderP5();
+}
+
+function p5Terima() {
+  const id = +document.getElementById('p5-tid').value;
+  const jml = +document.getElementById('p5-tjml').value;
+  const list = LS.get('p5_po', []);
+  const po = list.find(p => p.id === id);
+  if (!po) {
+    document.getElementById('p5-th').innerHTML = '<div class="alert error">❌ PO tidak ditemukan</div>';
+    return;
+  }
+  po.diterima += jml;
+  po.status = po.diterima >= po.jumlah ? 'diterima_penuh' : 'diterima_sebagian';
+
+  const bahan = LS.get('p5_bahan', []);
+  const b = bahan.find(x => x.kode === po.bahan);
+  if (b) b.stok += jml;
+
+  LS.set('p5_po', list);
+  LS.set('p5_bahan', bahan);
+
+  document.getElementById('p5-th').innerHTML =
+    '<div class="alert success">✅ Diterima ' + jml + ' unit ' + po.bahan + ' dari PO ' + po.no + '.<br>' +
+    'Total: ' + po.diterima + '/' + po.jumlah + ' → Status: <b>' + po.status + '</b>.<br>' +
+    'Stok ' + po.bahan + ' sekarang: <b>' + b.stok + '</b></div>';
+  renderP5();
+}
+
+function p5Analisis() {
+  document.getElementById('p5-analisis').innerHTML =
+    '<table><thead><tr><th>Opsi</th><th>Waktu</th><th>Biaya</th><th>Risiko</th><th>Rekomendasi</th></tr></thead><tbody>' +
+    '<tr><td>Cari pemasok alternatif Bahan B</td><td>2-3 hari</td><td>Sedang</td><td>Rendah</td><td><span class="badge green">✅ Utama</span></td></tr>' +
+    '<tr><td>Gunakan stok dari gudang lain</td><td>1 hari</td><td>Rendah</td><td>Sedang</td><td><span class="badge green">✅ Pendukung</span></td></tr>' +
+    '<tr><td>Jadwal ulang produksi (+2 hari)</td><td>0 hari</td><td>Tinggi (denda)</td><td>Tinggi</td><td><span class="badge red">❌ Hindari</span></td></tr>' +
+    '</tbody></table>' +
+    '<div class="alert success"><strong>Keputusan:</strong> Cari pemasok alternatif + gunakan stok cadangan. Risiko denda keterlambatan lebih mahal daripada biaya pengadaan alternatif.</div>';
+}
+
+/* ===== INIT ===== */
+initData();
+renderAll();
+</script>
+
+</body>
+</html>
